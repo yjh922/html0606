@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin:0px;}
+        #stage{
+            width: 1200px;
+            height: 800px;
+            background: yellow;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+    <script src="./GameObject.js"></script>
+    <script src="./Brick.js"></script>
+    <script src="./map.js"></script>
+    <script src="./Sensor.js"></script>
+    <script src="./Mario.js"></script>
+    <script src="./Flower.js"></script>
+    <script src="../js/lib.js"></script>
+    <script>
+        let stage;
+        let level=0; //현재 진행중인 게임의 스테이지 레벨
+
+        //이차원구조의 맵배열을 순서있게 보관할 일차원 배열 정의 
+        //결국 3차원배열이 된다..
+        let mapArray=[map1, map2];
+        let mario; //전역변수로 빼놓아야, 아래쪽의 loop()함수에서 
+        //주인공의 tick(), render() 를 호출해줄 수 있다..
+        
+        //벽돌을 왜 담아야 하는가? 주인공이 한번 움직일때마다, 화면에
+        //존재하는 모든 벽돌과 주인공이 충돌검사가 진행되어야 하므로
+        //다수의 벽돌은 배열에 담겨 있어야 반복문을 실행할 수 있다...
+        let brickArray=[]; //벽돌을 담아놓을 배열 
+
+        let flowerArray=[];//꽃 아이템들을 담아놓을 배열 
+
+        //벽돌을 2차원 구조로 출력하는 함수 정의 
+        function createBrick(){
+            //constructor(container, src, width, height, x, y, velX, velY)
+            for(let a=0;a<20;a++){
+                for(let i=0;i<30;i++){
+                    if(mapArray[level][a][i]==1){
+                        let brick=new Brick(stage, "./images/brick.png", 40,40, i*40, a*40,0,0);
+                        brickArray.push(brick);//배열에 담기                        
+                    }else if(mapArray[level][a][i]==2){ //좌표값이 2번이라면..주인공...
+                        mario=new Mario(stage,"./images/mario.png", 30,30, i*30, a*40, 0,0);
+                    }else if(mapArray[level][a][i]==3){ //좌표값이 2번이라면..주인공...
+                        let flower=new Flower(stage,"./images/flower.png", 40,40, i*40, a*40, 0,0);
+                        flowerArray.push(flower);
+                    }
+                }
+            }
+        }
+
+        //좌, 우로 움직이는 함수
+        function moveX(n){ //좌 -5, 우 5
+
+            //주인공이 벽돌과 충돌이 없을 경우
+            mario.velX=n;
+
+        }
+
+        //위, 아래로 움직이는 함수 
+        function moveY(n){ //위 -5, 아래 5
+            mario.velY=n;
+        }
+
+        //게임의 루프를 정의
+        function loop(){
+            //console.log("loop()...");
+            
+            //주인공의 tick(), render() 호출~~~
+            mario.tick();
+            mario.render();
+        }
+
+        function init(){
+            stage=document.getElementById("stage");
+            createBrick(); //벽돌 생성
+        }
+
+        addEventListener("load", function(){
+            init();
+            setInterval("loop()", 10);
+
+            //주인공을 키보드로 제어하기 위한 키이벤트 연결 
+            addEventListener("keydown", function(e){
+                switch(e.keyCode){
+                    case 37:moveX(-4);break; //좌
+                    case 39:moveX(4);break;//우
+                    case 38:moveY(-4);break;//위
+                    case 40:moveY(4);break;//아래
+                }                
+            });
+
+            addEventListener("keyup", function(e){
+                switch(e.keyCode){
+                    case 37:moveX(0);break; //좌
+                    case 39:moveX(0);break;//우
+                    case 38:moveY(0);break;//위
+                    case 40:moveY(0);break;//아래
+                }                
+            });
+
+        });
+        
+    </script>
+
+</head>
+<body>
+    <div id="stage"></div>
+</body>
+</html>
+
+
+
+
+
+
+
